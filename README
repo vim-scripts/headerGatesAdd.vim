@@ -1,0 +1,65 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=3407
+
+C/C++ header files should be guarded against multiple inclusions using preprocessor directives, e.g.:
+1.
+foo_n.h  or  FooN.h  or  foo n.h  ...
+#ifndef FOO_N_H
+#define FOO_N_H
+
+#endif   /*FOO_N_H*/
+
+2.
+if add let g:insert_extern_c_flag=1 in .vimrc or _vimrc
+when you create a new file name foo_h.h  it look like this:
+#ifndef FOO_N_H
+#define FOO_N_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif  /*FOO_N_H*/
+
+3.
+:HeaderGatesAdd
+this command will change 
+/**
+ * @file        foo_n.h
+ * @version     0.1.00
+ */
+
+void test();
+
+to:
+/**
+ * @file        foo_n.h
+ * @version     0.1.00
+ */
+#ifndef FOO_N_H
+#define FOO_N_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void test();
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif  /*FOO_N_H*/
+
+4.
+let g:HeaderGatesAdd_prefix="__"    
+foo_n.h ---------> __FOO_N_H
+5.
+let g:HeaderGatesAdd_suffix="SUFFIX"
+foo_n.h ---------> FOO_N_H_SUFFIX
+
+
