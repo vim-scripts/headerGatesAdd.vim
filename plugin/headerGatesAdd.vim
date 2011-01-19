@@ -26,8 +26,16 @@ endif
 
 "}}}
 
-if !exists('g:insert_extern_c_flag')
-    let g:insert_extern_c_flag=1
+if !exists('g:HeaderGatesAdd_extern_c')
+    let g:HeaderGatesAdd_extern_c=1
+endif
+
+if !exists('g:HeaderGatesAdd_prefix')
+    let g:HeaderGatesAdd_prefixg=""
+endif
+
+if !exists('g:HeaderGatesAdd_suffix')
+    let g:HeaderGatesAdd_suffix=""
 endif
 
 " insertHeaderGates {{{
@@ -80,19 +88,22 @@ def cplusHeaderGates():
         else:
             tmp.append(c.upper())
 
-    gatename = "".join(tmp)
+    gatename = vim.eval("g:HeaderGatesAdd_prefix")
+    gatename += "".join(tmp)
+    gatename +=vim.eval("g:HeaderGatesAdd_suffix")
     b = vim.current.buffer
     n = getInsertLine()
     b.append(["#ifndef " + gatename,
                 "#define " + gatename,
                 "\n"],n)
 
-    externCflag = vim.eval("g:insert_extern_c_flag")
+    externCflag = vim.eval("g:HeaderGatesAdd_extern_c")
     if externCflag=='1':
         b.append([ "#ifdef __cplusplus",
                     "extern \"C\" {",
-                    "#endif",
-                    "\n"], n+3)
+                    "#endif"], n+3)
+
+        b.append("\n")
         b.append("#ifdef __cplusplus")
         b.append("}")
         b.append("#endif")
