@@ -1,6 +1,7 @@
 This is a mirror of http://www.vim.org/scripts/script.php?script_id=3407
 
 C/C++ header files should be guarded against multiple inclusions using preprocessor directives, e.g.:
+let g:HeaderGatesAdd_suffix="_H"   is default  
 1.
 foo_n.h  or  FooN.h  or  foo n.h  ...
 #ifndef FOO_N_H
@@ -8,6 +9,8 @@ foo_n.h  or  FooN.h  or  foo n.h  ...
 
 #endif   /*FOO_N_H*/
 
+if you set  let g:HeaderGatesAdd_suffix="__"
+it could be   FOO_N__
 2.
 if add let g:insert_extern_c_flag=1 in .vimrc or _vimrc
 when you create a new file name foo_h.h  it look like this:
@@ -57,9 +60,21 @@ void test();
 
 4.
 let g:HeaderGatesAdd_prefix="__"    
-foo_n.h ---------> __FOO_N_H
+foo_n.h ---------> __FOO_N
 5.
-let g:HeaderGatesAdd_suffix="SUFFIX"
-foo_n.h ---------> FOO_N_H_SUFFIX
+let g:HeaderGatesAdd_suffix="_SUFFIX"
+foo_n.h ---------> FOO_N_SUFFIX
 
+6.
+in case of suffix and prefix both null:
+let g:HeaderGatesAdd_gate_type=0 is default
+aTestFile.h  ---------> A_TEST_FILE
 
+let g:HeaderGatesAdd_gate_type=1
+aTestFile.h  ---------> ATESTFILE
+
+let g:HeaderGatesAdd_gate_type=2
+aTestFile.h  --------->aTestFile
+
+may be you have other style,  u can send email to me.
+the end please forgive my poor english
