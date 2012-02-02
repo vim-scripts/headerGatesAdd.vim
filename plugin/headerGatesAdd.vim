@@ -2,9 +2,9 @@
 
 " File Name:      headerGatesAdd.vim
 " Abstract:       A (G)VIM plugin which automatic inser C/C++ header gates .
-" Author:         帅得不敢出门  email:tczengming at 163.com
-" Version:        1.0
-" Last Change:    2011.1.19
+" Author:         帅得不敢出门  email:tczengming@163.com
+" Version:        1.3
+" Last Change:    2012.2.1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -58,7 +58,7 @@ let loaded_cinsert_header_gates= 1
 
 " }}}
 
-" Python required {{{
+" Check Python {{{
 
 if !has('python')"
     finish
@@ -88,32 +88,36 @@ function! s:insertHeaderGates()
 python << EOF
 import vim
 import re
-#定位到头部说明信息（如版权，作者）的下一行
+#locate next line of Author License ...
 def getInsertLine():
     b=vim.current.buffer
     n = len(b)
-    start = b[0][0:2]
     i=0
-    if start == '//':
-        i=1
-        while( i<n and b[i][0:2] == '//'):
-            i+=1
-        if i>1:
-            return i
+    while (i<n and 0==len(b[i].lstrip())):
+        i+=1
+    while (i<n and b[i].lstrip()[0:2] == '//'):
+        i+=1
+    while (i<n and 0==len(b[i].lstrip())):
+        i+=1
+    if i == n:
+        return i
 
-    i=0
-    line = b[i]
+    line = b[i].lstrip()
+    start = line[0:2]
     while start == '/*':
         while (i<n-1 and line[len(line)-2 : len(line)] != '*/'):
             i+=1
             line = b[i]
-        
+        while (i<n and 0==len(b[i].lstrip())):
+            i+=1
         if i<n-1:
             i+=1
-            line = b[i]
+            line = b[i].lstrip()
             start = line[0:2]
         else:
-            return 0
+            if line[len(line)-2 : len(line)] == '*/':
+                i+=1
+            break
 
     return i
 
@@ -153,6 +157,10 @@ def cplusHeaderGates():
     gatename = generateGateName(name)
     b = vim.current.buffer
     n = getInsertLine()
+    if n > 0:
+        b.append("\n", n)
+        n+=1
+
     b.append(["#ifndef " + gatename,
                 "#define " + gatename,
                 "\n"],n)
@@ -180,4 +188,3 @@ endfunction
 
 command! -nargs=0 HeaderGatesAdd : call <SID>insertHeaderGates()
 autocmd BufNewFile *.{h,hpp} call <SID>insertHeaderGates()
-
